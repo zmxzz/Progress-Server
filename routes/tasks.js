@@ -14,15 +14,8 @@ router.get('', passport.authenticate('jwt', {session: false}), (req, res, next) 
 // Check if the user has the right to get tasks
 router.get('', (req, res, next) => {
     var decoded = jwt.verify(req.headers['authorization'].substring(4), config.secret);
-    if (decoded.username !== req.body.username) {
-        return res.status(401).send();
-    }
-    next();
-});
-
-// Return tasks
-router.get('', (req, res, next) => {
-    Task.getTasksByUsername(req.body.username, (err, tasks) => {
+    var username = decoded.username;
+    Task.getTasksByUsername(username, (err, tasks) => {
         if (err) {
             return res.status(400).end();
         }
@@ -30,7 +23,7 @@ router.get('', (req, res, next) => {
             tasks: tasks
         });
     });
-})
+});
 
 // Below is for ADD api
 // Check if token is valid
@@ -135,15 +128,6 @@ router.delete('', passport.authenticate('jwt', {session: false}), (req, res, nex
     next();
 });
 
-// Check if the user has the right to delete task
-router.delete('', (req, res, next) => {
-    var decoded = jwt.verify(req.headers['authorization'].substring(4), config.secret);
-    if (decoded.username !== req.body.username) {
-        return res.status(401).send();
-    }
-    next();
-});
-
 // Delete task
 router.delete('', (req, res, next) => {
     Task.deleteTaskById(req.body._id, (err) => {
@@ -151,7 +135,9 @@ router.delete('', (req, res, next) => {
             return res.status(400).end();
         };
     })
-    res.status(200).end();
+    res.json({
+        success: true
+    })
 })
 
 module.exports = router;

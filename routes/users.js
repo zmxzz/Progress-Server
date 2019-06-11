@@ -7,6 +7,13 @@ const User = require('../models/user_model');
 
 // Register
 router.post('/register', (req, res, next) => {
+    if (!req.body.email || !req.body.username || !req.body.passport) {
+        return res.status(400).send('Incomplete Information');
+    }
+    next();
+});
+
+router.post('/register', (req, res, next) => {
     let newUser = new User({
         firstName: req.body.firstName,
         lastName: req.body.lastName,
@@ -54,7 +61,7 @@ router.post('/authenticate', (req, res, next) => {
             }
             if (isMatch) {
                 const token = jwt.sign(user.toJSON(), config.secret, {
-                    expiresIn: 3600
+                    expiresIn: 86400
                 });
                 res.json({
                     success: true,
