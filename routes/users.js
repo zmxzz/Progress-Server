@@ -50,10 +50,7 @@ router.post('/authenticate', (req, res, next) => {
             throw err;
         }
         if (!user) {
-            return res.json({
-                success: false,
-                msg: 'User Not Found'
-            })
+            return res.status(401).end();
         }
         User.comparePassword(password, user.password, (err, isMatch) => {
             if (err) {
@@ -94,6 +91,5 @@ router.get('/validate', passport.authenticate('jwt', {session: false}), (req, re
 router.get('/profile', passport.authenticate('jwt', {session: false}), (req, res, next) => {
     res.json({user: req.user});
 });
-
 
 module.exports = router;
